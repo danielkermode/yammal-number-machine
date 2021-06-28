@@ -1,12 +1,16 @@
+use diesel::{QueryDsl, RunQueryDsl};
+
 #[macro_use]
-extern crate rocket;
+extern crate diesel;
+extern crate dotenv;
 
-#[get("/world")]
-fn world() -> &'static str {
-    "Hello, world!"
-}
+mod db;
+fn main() {
+    let connection = db::establish_connection();
 
-#[launch]
-fn rocket() -> _ {
-    rocket::build().mount("/hello", routes![world])
+    use db::schema::enjoyers::dsl::*;
+
+    let results = enjoyers.select(enjoyername).load::<String>(&connection);
+
+    println!("{:?}", results);
 }
