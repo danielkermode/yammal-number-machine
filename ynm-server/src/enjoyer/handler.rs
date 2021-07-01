@@ -19,7 +19,6 @@ pub fn create_enjoyer(
     new_enjoyer: Json<NewEnjoyer>,
     connection: DbConn,
 ) -> Result<status::Created<Json<EnjoyerResponse>>, Status> {
-    println!("here 0 {}", &new_enjoyer.enjoyername);
     enjoyer::repository::create_enjoyer(new_enjoyer.into_inner(), &connection)
         .map(|enjoyer| enjoyer_created(enjoyer))
         .map_err(|error| error_status(error))
@@ -46,7 +45,6 @@ pub fn update_enjoyer(
 }
 
 fn enjoyer_created(enjoyer: Enjoyer) -> status::Created<Json<EnjoyerResponse>> {
-    println!("here final");
     let enjoyer_response = EnjoyerResponse {
         id: enjoyer.id,
         enjoyername: enjoyer.enjoyername,
