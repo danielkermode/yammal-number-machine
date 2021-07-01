@@ -7,7 +7,7 @@ pub fn create_routes() {
     rocket::ignite()
         .manage(connection::init_pool())
         .mount(
-            "/posts",
+            "/enjoyers",
             routes![
                 enjoyer::handler::create_enjoyer,
                 enjoyer::handler::get_enjoyer,

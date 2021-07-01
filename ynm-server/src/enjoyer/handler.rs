@@ -1,4 +1,4 @@
-use diesel::result::Error;
+use diesel::result::{DatabaseErrorKind, Error};
 use rocket::http::Status;
 use rocket::response::status;
 use rocket_contrib::json::Json;
@@ -9,13 +9,16 @@ use uuid::Uuid;
 use crate::connection::DbConn;
 use crate::enjoyer;
 use crate::enjoyer::model::Enjoyer;
+use crate::enjoyer::model::EnjoyerResponse;
 use crate::enjoyer::model::NewEnjoyer;
+
+// use diesel::result::Error;
 
 #[post("/", format = "application/json", data = "<new_enjoyer>")]
 pub fn create_enjoyer(
     new_enjoyer: Json<NewEnjoyer>,
     connection: DbConn,
-) -> Result<status::Created<Json<Enjoyer>>, Status> {
+) -> Result<status::Created<Json<EnjoyerResponse>>, Status> {
     println!("here 0 {}", &new_enjoyer.enjoyername);
     enjoyer::repository::create_enjoyer(new_enjoyer.into_inner(), &connection)
         .map(|enjoyer| enjoyer_created(enjoyer))
@@ -42,8 +45,12 @@ pub fn update_enjoyer(
         .map_err(|error| error_status(error))
 }
 
-fn enjoyer_created(enjoyer: Enjoyer) -> status::Created<Json<Enjoyer>> {
+fn enjoyer_created(enjoyer: Enjoyer) -> status::Created<Json<EnjoyerResponse>> {
     println!("here final");
+    let enjoyer_response = EnjoyerResponse {
+        id: enjoyer.id,
+        enjoyername: enjoyer.enjoyername,
+    };
     status::Created(
         format!(
             "{host}:{port}/enjoyer/{id}",
@@ -52,7 +59,7 @@ fn enjoyer_created(enjoyer: Enjoyer) -> status::Created<Json<Enjoyer>> {
             id = enjoyer.id
         )
         .to_string(),
-        Some(Json(enjoyer)),
+        Some(Json(enjoyer_response)),
     )
 }
 
@@ -67,6 +74,7 @@ fn port() -> String {
 fn error_status(error: Error) -> Status {
     match error {
         Error::NotFound => Status::NotFound,
+        Error::DatabaseError(DatabaseErrorKind::UniqueViolation, _err) => Status::Conflict,
         _ => Status::InternalServerError,
     }
 }

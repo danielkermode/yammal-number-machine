@@ -9,6 +9,11 @@ pub struct Enjoyer {
     pub enjoyername: String,
     pub password: String,
 }
+#[derive(Serialize)]
+pub struct EnjoyerResponse {
+    pub id: uuid::Uuid,
+    pub enjoyername: String,
+}
 
 #[derive(Insertable, Serialize, Deserialize)]
 #[table_name = "enjoyers"]
