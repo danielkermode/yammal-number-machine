@@ -1,16 +1,22 @@
-use diesel::{QueryDsl, RunQueryDsl};
-
+#![feature(decl_macro, proc_macro_hygiene)]
 #[macro_use]
 extern crate diesel;
 extern crate dotenv;
+extern crate r2d2;
+extern crate r2d2_diesel;
+#[macro_use]
+extern crate rocket;
+extern crate rocket_contrib;
+#[macro_use]
+extern crate serde_derive;
 
-mod db;
+use dotenv::dotenv;
+
+mod connection;
+mod enjoyer;
+mod schema;
+
 fn main() {
-    let connection = db::establish_connection();
-
-    use db::schema::enjoyers::dsl::*;
-
-    let results = enjoyers.select(enjoyername).load::<String>(&connection);
-
-    println!("{:?}", results);
+    dotenv().ok();
+    enjoyer::router::create_routes();
 }
