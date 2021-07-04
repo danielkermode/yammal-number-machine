@@ -23,3 +23,9 @@ DATABASE_URL="postgresql://dankermode:dankermode@localhost:5432/ynm"
 # Run server
 
 1. `cargo run`
+
+# Deploy
+
+1. Install rustup on ubuntu: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
+2. Install build-essential: `sudo apt install build-essential`
+3. TRICKY: Install postgres lib `sudo apt install libpq-dev`
