@@ -1,3 +1,8 @@
+import React from 'react'
+import {
+  Link
+} from 'react-router-dom'
+
 export default function Header () {
   return (
     <nav>
@@ -9,7 +14,7 @@ export default function Header () {
           <Link to='/about'>About</Link>
         </li>
         <li>
-          <Link to='/users'>Users</Link>
+          <Link to='/tokens'>Tokens</Link>
         </li>
       </ul>
     </nav>

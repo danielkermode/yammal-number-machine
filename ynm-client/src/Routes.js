@@ -4,7 +4,11 @@ import {
   Route
 } from 'react-router-dom'
 
-export default function App () {
+import Home from './pages/Home'
+import About from './pages/About'
+import Register from './pages/Register'
+
+export default function Routes () {
   return (
     <Switch>
       <Route path='/about'>

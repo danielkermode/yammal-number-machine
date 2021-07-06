@@ -1,14 +1,16 @@
+import React from 'react'
+import {
+  BrowserRouter as Router
+} from 'react-router-dom'
 
-function App () {
+import routes from './routes'
+import Header from './components/Header'
+
+export default function App () {
   return (
-    <div>
-      <header>
-        <p>
-          Yammal number machine.
-        </p>
-      </header>
-    </div>
+    <Router>
+      <Header />
+      {routes()}
+    </Router>
   )
 }
-
-export default App
