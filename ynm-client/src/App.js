@@ -1,4 +1,5 @@
-function App() {
+
+function App () {
   return (
     <div>
       <header>
@@ -7,7 +8,7 @@ function App() {
         </p>
       </header>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

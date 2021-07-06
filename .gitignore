@@ -2,3 +2,5 @@
 *.env
 *.dat
 */node_modules
+*/production
+.vscode
