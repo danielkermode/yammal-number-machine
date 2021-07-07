@@ -2,7 +2,7 @@
 
 use crate::schema::enjoyers;
 
-#[derive(Queryable, AsChangeset, Serialize, Deserialize, Debug)]
+#[derive(Queryable, AsChangeset, Serialize, Deserialize)]
 #[table_name = "enjoyers"]
 pub struct Enjoyer {
     pub id: uuid::Uuid,
@@ -17,7 +17,7 @@ pub struct EnjoyerResponse {
 
 #[derive(Insertable, Serialize, Deserialize)]
 #[table_name = "enjoyers"]
-pub struct NewEnjoyer<'a> {
+pub struct EnjoyerInfo<'a> {
     pub enjoyername: &'a str,
     pub password: &'a str,
 }

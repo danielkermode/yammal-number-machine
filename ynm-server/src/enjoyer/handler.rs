@@ -1,4 +1,6 @@
 use diesel::result::{DatabaseErrorKind, Error};
+use rocket::http::Cookie;
+use rocket::http::Cookies;
 use rocket::http::Status;
 use rocket::response::status;
 use rocket_contrib::json::Json;
@@ -9,19 +11,42 @@ use uuid::Uuid;
 use crate::connection::DbConn;
 use crate::enjoyer;
 use crate::enjoyer::model::Enjoyer;
+use crate::enjoyer::model::EnjoyerInfo;
 use crate::enjoyer::model::EnjoyerResponse;
-use crate::enjoyer::model::NewEnjoyer;
 
-// use diesel::result::Error;
+use bcrypt::verify;
 
 #[post("/", format = "application/json", data = "<new_enjoyer>")]
 pub fn create_enjoyer(
-    new_enjoyer: Json<NewEnjoyer>,
+    new_enjoyer: Json<EnjoyerInfo>,
     connection: DbConn,
 ) -> Result<status::Created<Json<EnjoyerResponse>>, Status> {
     enjoyer::repository::create_enjoyer(new_enjoyer.into_inner(), &connection)
         .map(|enjoyer| enjoyer_created(enjoyer))
         .map_err(|error| error_status(error))
+}
+
+#[post("/login", format = "application/json", data = "<login_info>")]
+pub fn login(
+    login_info: Json<EnjoyerInfo>,
+    mut cookies: Cookies,
+    connection: DbConn,
+) -> Result<Json<Uuid>, Status> {
+    let enjoyer_result =
+        enjoyer::repository::get_enjoyer_by_name(login_info.enjoyername, &connection);
+
+    let enjoyer_id = enjoyer_result.as_ref().unwrap().id.to_string();
+    cookies.add_private(Cookie::new("user_id", enjoyer_id));
+
+    return enjoyer_result
+        .map(|enjoyer| verify_enjoyer(enjoyer, login_info))
+        .map_err(|error| error_status(error));
+}
+
+fn verify_enjoyer(enjoyer: Enjoyer, login_info: Json<EnjoyerInfo>) -> Json<Uuid> {
+    let _valid = verify(login_info.password, &enjoyer.password).unwrap();
+
+    Json(enjoyer.id)
 }
 
 #[get("/<id>")]

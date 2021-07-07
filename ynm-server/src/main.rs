@@ -11,12 +11,40 @@ extern crate rocket_contrib;
 extern crate serde_derive;
 
 use dotenv::dotenv;
+use rocket::http::Method;
+use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
 mod connection;
 mod enjoyer;
 mod schema;
 
+#[get("/check")]
+fn index() -> &'static str {
+    "Rust server running!"
+}
+
 fn main() {
     dotenv().ok();
-    enjoyer::router::create_routes();
+
+    let allowed_origins = AllowedOrigins::All;
+
+    let cors = rocket_cors::CorsOptions {
+        allowed_origins,
+        allowed_methods: vec![Method::Get, Method::Post]
+            .into_iter()
+            .map(From::from)
+            .collect(),
+        allowed_headers: AllowedHeaders::all(),
+        allow_credentials: true,
+        ..Default::default()
+    }
+    .to_cors()
+    .unwrap();
+
+    rocket::ignite()
+        .manage(connection::init_pool())
+        .mount("/api", routes![index])
+        .mount("/api/enjoyers", enjoyer::router::create_routes())
+        .attach(cors)
+        .launch();
 }

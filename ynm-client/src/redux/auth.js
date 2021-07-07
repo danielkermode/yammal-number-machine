@@ -6,9 +6,9 @@ const authSlice = createSlice({
   name: 'auth',
   initialState: { error: null, enjoyer: null },
   reducers: {
-    setUser (state, action) {
-      const { user } = action.payload
-      state.user = user
+    setEnjoyer (state, action) {
+      const { enjoyer } = action.payload
+      state.enjoyer = enjoyer
     },
     setError (state, action) {
       const { error } = action.payload
@@ -20,38 +20,30 @@ const authSlice = createSlice({
 export const { setError, setUser } = authSlice.actions
 
 export const register = registerDetails => async dispatch => {
-  const resp = await axios({
-    method: 'post',
-    url: `${apiUrl}/enjoyers`,
-    data: {
-      enjoyername: registerDetails.name,
-      password: registerDetails.password
-    }
-  })
+  // const resp = await axios({
+  //   method: 'post',
+  //   url: `${apiUrl}/enjoyers`,
+  //   data: {
+  //     enjoyername: registerDetails.name,
+  //     password: registerDetails.password
+  //   }
+  // })
 
-  console.log(resp)
+  login(registerDetails)(dispatch)
 }
 
-export const login = (
-  email,
-  password,
-  history,
-  type
-) => async dispatch => {
+export const login = loginDetails => async dispatch => {
   try {
     const resp = await axios({
       method: 'post',
-      url: `${apiUrl}/${type}/login`,
+      url: `${apiUrl}/enjoyers/login`,
       data: {
-        email,
-        password
+        enjoyername: loginDetails.name,
+        password: loginDetails.password
       },
       withCredentials: true
     })
-    const user = resp.data.user
-    dispatch(setUser({ user }))
-    const redirectUri = type === 'employers' ? `/${user.id}/jobs` : `admin/${user.id}/employers`
-    history.push(redirectUri)
+    console.log(resp)
   } catch (err) {
     if (err.response && err.response.data.message) {
       window.alert(err.response.data.message)
