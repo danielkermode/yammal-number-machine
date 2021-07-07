@@ -36,11 +36,11 @@ pub fn login(
         enjoyer::repository::get_enjoyer_by_name(login_info.enjoyername, &connection);
 
     let enjoyer_id = enjoyer_result.as_ref().unwrap().id.to_string();
-    cookies.add_private(Cookie::new("user_id", enjoyer_id));
+    cookies.add_private(Cookie::new("auth_cookie", enjoyer_id));
 
-    return enjoyer_result
+    enjoyer_result
         .map(|enjoyer| verify_enjoyer(enjoyer, login_info))
-        .map_err(|error| error_status(error));
+        .map_err(|error| error_status(error))
 }
 
 fn verify_enjoyer(enjoyer: Enjoyer, login_info: Json<EnjoyerInfo>) -> Json<Uuid> {
@@ -50,11 +50,23 @@ fn verify_enjoyer(enjoyer: Enjoyer, login_info: Json<EnjoyerInfo>) -> Json<Uuid>
 }
 
 #[get("/<id>")]
-pub fn get_enjoyer(id: String, connection: DbConn) -> Result<Json<Enjoyer>, Status> {
+pub fn get_enjoyer(
+    id: String,
+    mut cookies: Cookies,
+    connection: DbConn,
+) -> Result<Json<Enjoyer>, Status> {
     let uuid = Uuid::from_str(&id).expect("valid UUID string");
-    enjoyer::repository::get_enjoyer(uuid, &connection)
-        .map(|enjoyer| Json(enjoyer))
-        .map_err(|error| error_status(error))
+    let auth_cookie = cookies.get_private("auth_cookie");
+    let auth_uuid = Uuid::from_str(auth_cookie.as_ref().unwrap().value()).unwrap();
+    // Check if cookie matches user id
+    let valid_cookie = uuid == auth_uuid;
+    if valid_cookie == true {
+        enjoyer::repository::get_enjoyer(uuid, &connection)
+            .map(|enjoyer| Json(enjoyer))
+            .map_err(|error| error_status(error))
+    } else {
+        Err(Status::Forbidden)
+    }
 }
 
 #[put("/<id>", format = "application/json", data = "<enjoyer>")]

@@ -44,6 +44,8 @@ export const login = loginDetails => async dispatch => {
       withCredentials: true
     })
     console.log(resp)
+
+    checkUser(resp.data)(dispatch)
   } catch (err) {
     if (err.response && err.response.data.message) {
       window.alert(err.response.data.message)
@@ -90,61 +92,17 @@ export const updateUser = (userDetails) => async (dispatch) => {
   }
 }
 
-export const updateUserLogoImg = (id, formData) => async (dispatch, getState) => {
-  try {
-    const resp = await axios({
-      method: 'post',
-      url: `${apiUrl}/employers/${id}/image`,
-      data: formData,
-      headers: {
-        'Content-type': 'multipart/form-data'
-      },
-      withCredentials: true
-    })
-    const user = resp.data.user
-    const oldUser = getState().auth.user
-    dispatch(setUser({ user: { ...oldUser, ...user } }))
-  } catch (err) {
-    if (err.response && err.response.status === 413) {
-      window.alert('Logo image is too large. Max file size is 5mb.')
-    } else if (err.response && err.response.data.message) {
-      window.alert(err.response.data.message)
-    } else {
-      window.alert(err.toString())
-    }
-    dispatch(setError({ error: err.toString() }))
-  }
-}
-
-export const updateUserPassword = (id, passwordData) => async (dispatch) => {
-  try {
-    const resp = await axios({
-      method: 'post',
-      url: `${apiUrl}/employers/${id}/password`,
-      data: passwordData,
-      withCredentials: true
-    })
-    if (resp.data.success) {
-      window.alert('Password changed successfully.')
-    }
-  } catch (err) {
-    console.log(err)
-    // dispatch(setError({ error: err.toString() }))
-  }
-}
-
-export const checkUser = (id, history, type = 'employers') => async (dispatch) => {
+export const checkUser = id => async dispatch => {
   try {
     const resp = await axios({
       method: 'get',
-      url: `${apiUrl}/${type}/${id}`,
+      url: `${apiUrl}/enjoyers/${id}`,
       withCredentials: true
     })
-    const user = resp.data.user
-    dispatch(setUser({ user }))
+    console.log(resp)
+    // dispatch(setUser({ user }))
   } catch (err) {
     dispatch(setError({ error: err.toString() }))
-    history.push(type === 'admins' ? '/admin' : '/auth')
   }
 }
 
