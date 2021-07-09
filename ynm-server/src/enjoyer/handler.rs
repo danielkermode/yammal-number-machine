@@ -36,7 +36,9 @@ pub fn login(
         enjoyer::repository::get_enjoyer_by_name(login_info.enjoyername, &connection);
 
     let enjoyer_id = enjoyer_result.as_ref().unwrap().id.to_string();
-    cookies.add_private(Cookie::new("auth_cookie", enjoyer_id));
+    let mut cookie = Cookie::new("auth_cookie", enjoyer_id);
+    cookie.set_secure(true);
+    cookies.add_private(cookie);
 
     enjoyer_result
         .map(|enjoyer| verify_enjoyer(enjoyer, login_info))
