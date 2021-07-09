@@ -44,9 +44,10 @@ export const login = (loginDetails, history) => async dispatch => {
       withCredentials: true
     })
     const getEnjoyerThunk = getEnjoyer(resp.data)
-    await getEnjoyerThunk()
+    await getEnjoyerThunk(dispatch)
     history.push('/')
   } catch (err) {
+    console.log(err)
     if (err.response && err.response.data.message) {
       window.alert(err.response.data.message)
     }
