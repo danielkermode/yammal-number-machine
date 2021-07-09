@@ -9,6 +9,7 @@ import {
   Button
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { useHistory } from 'react-router-dom'
 
 import { connect } from 'react-redux'
 import { login } from '../redux/auth'
@@ -16,6 +17,8 @@ import { login } from '../redux/auth'
 const mapDispatch = { login }
 
 function Login (props) {
+  const history = useHistory()
+
   const [show, setShow] = React.useState(false)
 
   const [loginDetails, setLoginDetails] = React.useState({
@@ -30,7 +33,7 @@ function Login (props) {
   }
 
   const login = () => {
-    props.login(loginDetails)
+    props.login(loginDetails, history)
   }
 
   const handleClick = () => setShow(!show)

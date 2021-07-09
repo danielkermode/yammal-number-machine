@@ -56,7 +56,7 @@ pub fn get_enjoyer(
     id: String,
     mut cookies: Cookies,
     connection: DbConn,
-) -> Result<Json<Enjoyer>, Status> {
+) -> Result<Json<EnjoyerResponse>, Status> {
     let uuid = Uuid::from_str(&id).expect("valid UUID string");
     let auth_cookie = cookies.get_private("ynm_auth");
     let auth_uuid = Uuid::from_str(auth_cookie.as_ref().unwrap().value()).unwrap();
@@ -64,7 +64,12 @@ pub fn get_enjoyer(
     let valid_cookie = uuid == auth_uuid;
     if valid_cookie == true {
         enjoyer::repository::get_enjoyer(uuid, &connection)
-            .map(|enjoyer| Json(enjoyer))
+            .map(|enjoyer| {
+                Json(EnjoyerResponse {
+                    id: enjoyer.id,
+                    enjoyername: enjoyer.enjoyername,
+                })
+            })
             .map_err(|error| error_status(error))
     } else {
         Err(Status::Forbidden)

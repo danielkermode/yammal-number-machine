@@ -17,7 +17,7 @@ const authSlice = createSlice({
   }
 })
 
-export const { setError, setUser } = authSlice.actions
+export const { setError, setEnjoyer } = authSlice.actions
 
 export const register = registerDetails => async dispatch => {
   const resp = await axios({
@@ -32,7 +32,7 @@ export const register = registerDetails => async dispatch => {
   console.log(resp)
 }
 
-export const login = loginDetails => async dispatch => {
+export const login = (loginDetails, history) => async dispatch => {
   try {
     const resp = await axios({
       method: 'post',
@@ -43,9 +43,9 @@ export const login = loginDetails => async dispatch => {
       },
       withCredentials: true
     })
-    console.log(resp)
-
-    getUser(resp.data)(dispatch)
+    const getEnjoyerThunk = getEnjoyer(resp.data)
+    await getEnjoyerThunk()
+    history.push('/')
   } catch (err) {
     if (err.response && err.response.data.message) {
       window.alert(err.response.data.message)
@@ -64,22 +64,21 @@ export const logout = (history, type) => async dispatch => {
 
     console.log(resp)
 
-    dispatch(setUser({ user: null }))
+    dispatch(setEnjoyer({ enjoyer: null }))
     history.push(type === 'admins' ? '/admin' : '/auth')
   } catch (err) {
     dispatch(setError({ error: err.toString() }))
   }
 }
 
-export const getUser = id => async dispatch => {
+export const getEnjoyer = id => async dispatch => {
   try {
     const resp = await axios({
       method: 'get',
       url: `${apiUrl}/enjoyers/${id}`,
       withCredentials: true
     })
-    console.log(resp)
-    // dispatch(setUser({ user }))
+    dispatch(setEnjoyer({ enjoyer: resp.data }))
   } catch (err) {
     dispatch(setError({ error: err.toString() }))
   }

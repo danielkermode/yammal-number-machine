@@ -1,24 +1,31 @@
+/* eslint-disable react/jsx-closing-tag-location */
 import React from 'react'
 import {
   Box,
-  Flex,
-  Text
+  Text,
+  Button
 } from '@chakra-ui/react'
 import Register from '../components/Register'
 import Login from '../components/Login'
 
 function AuthenticatePage (props) {
+  const [showLogin, setShowLogin] = React.useState(false)
+
+  const toggleLogin = () => setShowLogin(!showLogin)
+  const buttonText = showLogin ? 'Sign up' : 'Already have an account?'
   return (
-    <Flex mt={50}>
-      <Box w='40%'>
-        <Text>Sign Up</Text>
-        <Register />
-      </Box>
-      <Box w='40%' ml={50}>
-        <Text>Log in</Text>
-        <Login />
-      </Box>
-    </Flex>
+    <Box mt={50}>
+      <Button onClick={toggleLogin}>{buttonText}</Button>
+      {showLogin
+        ? <Box w='40%'>
+          <Text>Log in</Text>
+          <Login />
+        </Box>
+        : <Box w='40%'>
+          <Text>Sign Up</Text>
+          <Register />
+        </Box>}
+    </Box>
   )
 }
 
