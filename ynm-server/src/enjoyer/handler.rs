@@ -36,9 +36,9 @@ pub fn login(
         enjoyer::repository::get_enjoyer_by_name(login_info.enjoyername, &connection);
 
     let enjoyer_id = enjoyer_result.as_ref().unwrap().id.to_string();
-    let mut cookie = Cookie::new("auth_cookie", enjoyer_id);
-    cookie.set_secure(true);
-    cookies.add_private(cookie);
+    let mut auth_cookie = Cookie::new("ynm_auth", enjoyer_id);
+    auth_cookie.set_secure(true);
+    cookies.add_private(auth_cookie);
 
     enjoyer_result
         .map(|enjoyer| verify_enjoyer(enjoyer, login_info))
@@ -58,7 +58,7 @@ pub fn get_enjoyer(
     connection: DbConn,
 ) -> Result<Json<Enjoyer>, Status> {
     let uuid = Uuid::from_str(&id).expect("valid UUID string");
-    let auth_cookie = cookies.get_private("auth_cookie");
+    let auth_cookie = cookies.get_private("ynm_auth");
     let auth_uuid = Uuid::from_str(auth_cookie.as_ref().unwrap().value()).unwrap();
     // Check if cookie matches user id
     let valid_cookie = uuid == auth_uuid;

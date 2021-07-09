@@ -20,16 +20,16 @@ const authSlice = createSlice({
 export const { setError, setUser } = authSlice.actions
 
 export const register = registerDetails => async dispatch => {
-  // const resp = await axios({
-  //   method: 'post',
-  //   url: `${apiUrl}/enjoyers`,
-  //   data: {
-  //     enjoyername: registerDetails.name,
-  //     password: registerDetails.password
-  //   }
-  // })
+  const resp = await axios({
+    method: 'post',
+    url: `${apiUrl}/enjoyers`,
+    data: {
+      enjoyername: registerDetails.name,
+      password: registerDetails.password
+    }
+  })
 
-  login(registerDetails)(dispatch)
+  console.log(resp)
 }
 
 export const login = loginDetails => async dispatch => {
@@ -45,7 +45,7 @@ export const login = loginDetails => async dispatch => {
     })
     console.log(resp)
 
-    checkUser(resp.data)(dispatch)
+    getUser(resp.data)(dispatch)
   } catch (err) {
     if (err.response && err.response.data.message) {
       window.alert(err.response.data.message)
@@ -71,28 +71,7 @@ export const logout = (history, type) => async dispatch => {
   }
 }
 
-export const updateUser = (userDetails) => async (dispatch) => {
-  try {
-    const resp = await axios({
-      method: 'post',
-      url: `${apiUrl}/employers/${userDetails.id}`,
-      data: userDetails,
-      withCredentials: true
-    })
-    const user = resp.data.user
-    dispatch(setUser({ user }))
-  } catch (err) {
-    if (err.response && err.response.data.message) {
-      window.alert(err.response.data.message)
-    } else {
-      window.alert(err.toString())
-    }
-
-    dispatch(setError({ error: err.toString() }))
-  }
-}
-
-export const checkUser = id => async dispatch => {
+export const getUser = id => async dispatch => {
   try {
     const resp = await axios({
       method: 'get',

@@ -1,10 +1,10 @@
 import React from 'react'
 import { Box } from '@chakra-ui/react'
 
-export default function About () {
+export default function Home () {
   return (
     <Box>
-      This is all about Yammal!!
+      Page not found.
     </Box>
   )
 }

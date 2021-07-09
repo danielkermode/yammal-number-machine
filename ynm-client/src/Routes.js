@@ -6,20 +6,22 @@ import {
 
 import Home from './pages/Home'
 import About from './pages/About'
-import Register from './pages/Register'
+import AuthenticatePage from './pages/Authenticate'
+import NotFound from './pages/NotFound'
 
 export default function Routes () {
   return (
     <Switch>
-      <Route path='/about'>
+      <Route exact path='/about'>
         <About />
       </Route>
-      <Route path='/tokens'>
-        <Register />
+      <Route exact path='/tokens'>
+        <AuthenticatePage />
       </Route>
-      <Route path='/'>
+      <Route exact path='/'>
         <Home />
       </Route>
+      <Route component={NotFound} />
     </Switch>
   )
 }
