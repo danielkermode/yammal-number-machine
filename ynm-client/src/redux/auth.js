@@ -4,37 +4,40 @@ import { apiUrl } from '../api'
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { error: null, enjoyer: null },
+  initialState: { enjoyer: null },
   reducers: {
     setEnjoyer (state, action) {
       const { enjoyer } = action.payload
       state.enjoyer = enjoyer
-    },
-    setError (state, action) {
-      const { error } = action.payload
-      state.error = error
     }
   }
 })
 
 export const { setError, setEnjoyer } = authSlice.actions
 
-export const register = registerDetails => async dispatch => {
-  const resp = await axios({
-    method: 'post',
-    url: `${apiUrl}/enjoyers`,
-    data: {
-      enjoyername: registerDetails.name,
-      password: registerDetails.password
-    }
-  })
+export const register = (registerDetails, history) => async dispatch => {
+  const enjoyerData = {
+    enjoyername: registerDetails.name,
+    password: registerDetails.password
+  }
+  try {
+    await axios({
+      method: 'post',
+      url: `${apiUrl}/enjoyers`,
+      data: enjoyerData
+    })
 
-  console.log(resp)
+    const loginThunk = login(enjoyerData, history)
+    await loginThunk(dispatch)
+  } catch (err) {
+    console.error(err)
+    window.alert(err.message)
+  }
 }
 
 export const login = (loginDetails, history) => async dispatch => {
   try {
-    const resp = await axios({
+    const response = await axios({
       method: 'post',
       url: `${apiUrl}/enjoyers/login`,
       data: {
@@ -43,45 +46,42 @@ export const login = (loginDetails, history) => async dispatch => {
       },
       withCredentials: true
     })
-    const getEnjoyerThunk = getEnjoyer(resp.data)
+    const getEnjoyerThunk = getEnjoyer(response.data)
     await getEnjoyerThunk(dispatch)
     history.push('/')
   } catch (err) {
-    console.log(err)
-    if (err.response && err.response.data.message) {
-      window.alert(err.response.data.message)
-    }
-    dispatch(setError({ error: err.toString() }))
+    console.error(err)
+    window.alert(err.message)
   }
 }
 
-export const logout = (history, type) => async dispatch => {
+export const logout = () => async dispatch => {
   try {
-    const resp = await axios({
+    const response = await axios({
       method: 'post',
       url: `${apiUrl}/logout`,
       withCredentials: true
     })
 
-    console.log(resp)
-
+    console.log(response)
     dispatch(setEnjoyer({ enjoyer: null }))
-    history.push(type === 'admins' ? '/admin' : '/auth')
   } catch (err) {
-    dispatch(setError({ error: err.toString() }))
+    console.error(err)
+    window.alert(err.message)
   }
 }
 
 export const getEnjoyer = id => async dispatch => {
   try {
-    const resp = await axios({
+    const response = await axios({
       method: 'get',
       url: `${apiUrl}/enjoyers/${id}`,
       withCredentials: true
     })
-    dispatch(setEnjoyer({ enjoyer: resp.data }))
+    dispatch(setEnjoyer({ enjoyer: response.data }))
   } catch (err) {
-    dispatch(setError({ error: err.toString() }))
+    console.error(err)
+    window.alert(err.message)
   }
 }
 

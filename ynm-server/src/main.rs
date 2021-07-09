@@ -23,7 +23,7 @@ fn index() -> &'static str {
     "Rust server running!"
 }
 
-fn main() {
+fn main() -> () {
     dotenv().ok();
 
     let allowed_origins = AllowedOrigins::All;
@@ -39,12 +39,14 @@ fn main() {
         ..Default::default()
     }
     .to_cors()
-    .unwrap();
+    .unwrap_or_else(|e| panic!("{}", e));
 
-    rocket::ignite()
+    let launch_error = rocket::ignite()
         .manage(connection::init_pool())
         .mount("/api", routes![index])
         .mount("/api/enjoyers", enjoyer::router::create_routes())
         .attach(cors)
         .launch();
+
+    drop(launch_error)
 }

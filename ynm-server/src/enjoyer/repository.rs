@@ -6,6 +6,7 @@ use crate::enjoyer::model::EnjoyerInfo;
 use bcrypt::{hash, DEFAULT_COST};
 use diesel;
 use diesel::prelude::*;
+use diesel::result::Error;
 
 use crate::schema::enjoyers;
 use crate::schema::enjoyers::dsl::*;
@@ -13,7 +14,8 @@ use uuid::Uuid;
 
 pub fn create_enjoyer(new_enjoyer: EnjoyerInfo, conn: &PgConnection) -> QueryResult<Enjoyer> {
     // Hash password before inserting into DB
-    let hashed_password = hash(new_enjoyer.password, DEFAULT_COST).unwrap();
+    let hashed_password =
+        hash(new_enjoyer.password, DEFAULT_COST).map_err(|_| Error::__Nonexhaustive)?;
     let hashed_enjoyer = EnjoyerInfo {
         enjoyername: new_enjoyer.enjoyername,
         password: &hashed_password,

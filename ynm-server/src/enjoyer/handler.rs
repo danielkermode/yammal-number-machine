@@ -1,7 +1,9 @@
 use diesel::result::{DatabaseErrorKind, Error};
 use rocket::http::Cookie;
 use rocket::http::Cookies;
+use rocket::http::RawStr;
 use rocket::http::Status;
+use rocket::request::{self, FromRequest, Request};
 use rocket::response::status;
 use rocket_contrib::json::Json;
 use std::env;
@@ -15,6 +17,40 @@ use crate::enjoyer::model::EnjoyerInfo;
 use crate::enjoyer::model::EnjoyerResponse;
 
 use bcrypt::verify;
+
+pub struct VerifiedEnjoyerUuid {
+    value: Uuid,
+}
+
+impl<'a, 'r> FromRequest<'a, 'r> for VerifiedEnjoyerUuid {
+    fn from_request(req: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
+        let segment: &RawStr = req
+            .get_param(0)
+            .and_then(|r| r.ok())
+            .unwrap_or("bad segment".into());
+        let uuid = Uuid::from_str(segment)
+            .map_err(|_| (Status::BadRequest, "Invalid uuid in segment".to_string()))?;
+        req.cookies().get_private("ynm_auth").map_or(
+            request::Outcome::Failure((Status::Forbidden, "No auth cookie".to_string())),
+            |c| compare_cookie_to_uuid(c, uuid),
+        )
+    }
+
+    type Error = String;
+}
+
+fn compare_cookie_to_uuid(
+    c: Cookie,
+    uuid: Uuid,
+) -> request::Outcome<VerifiedEnjoyerUuid, <VerifiedEnjoyerUuid as FromRequest>::Error> {
+    let valid_cookie = Uuid::from_str(c.value())
+        .map_err(|_| (Status::Forbidden, "Invalid cookie uuid".to_string()))?;
+    if valid_cookie == uuid {
+        request::Outcome::Success(VerifiedEnjoyerUuid { value: uuid })
+    } else {
+        request::Outcome::Failure((Status::Forbidden, "Cookie does not match uuid".to_string()))
+    }
+}
 
 #[post("/", format = "application/json", data = "<new_enjoyer>")]
 pub fn create_enjoyer(
@@ -32,48 +68,39 @@ pub fn login(
     mut cookies: Cookies,
     connection: DbConn,
 ) -> Result<Json<Uuid>, Status> {
-    let enjoyer_result =
-        enjoyer::repository::get_enjoyer_by_name(login_info.enjoyername, &connection);
+    let enjoyer = enjoyer::repository::get_enjoyer_by_name(login_info.enjoyername, &connection)
+        .map_err(|error| error_status(error))?;
 
-    let enjoyer_id = enjoyer_result.as_ref().unwrap().id.to_string();
+    let enjoyer_id = (&enjoyer.id).to_string();
     let mut auth_cookie = Cookie::new("ynm_auth", enjoyer_id);
     auth_cookie.set_secure(true);
     cookies.add_private(auth_cookie);
 
-    enjoyer_result
-        .map(|enjoyer| verify_enjoyer(enjoyer, login_info))
-        .map_err(|error| error_status(error))
-}
+    let valid_password =
+        verify(login_info.password, &enjoyer.password).map_err(|_| Status::InternalServerError)?;
 
-fn verify_enjoyer(enjoyer: Enjoyer, login_info: Json<EnjoyerInfo>) -> Json<Uuid> {
-    let _valid = verify(login_info.password, &enjoyer.password).unwrap();
-
-    Json(enjoyer.id)
-}
-
-#[get("/<id>")]
-pub fn get_enjoyer(
-    id: String,
-    mut cookies: Cookies,
-    connection: DbConn,
-) -> Result<Json<EnjoyerResponse>, Status> {
-    let uuid = Uuid::from_str(&id).expect("valid UUID string");
-    let auth_cookie = cookies.get_private("ynm_auth");
-    let auth_uuid = Uuid::from_str(auth_cookie.as_ref().unwrap().value()).unwrap();
-    // Check if cookie matches user id
-    let valid_cookie = uuid == auth_uuid;
-    if valid_cookie == true {
-        enjoyer::repository::get_enjoyer(uuid, &connection)
-            .map(|enjoyer| {
-                Json(EnjoyerResponse {
-                    id: enjoyer.id,
-                    enjoyername: enjoyer.enjoyername,
-                })
-            })
-            .map_err(|error| error_status(error))
+    if valid_password {
+        Ok(Json(enjoyer.id))
     } else {
         Err(Status::Forbidden)
     }
+}
+
+#[get("/<_uuid>")]
+pub fn get_enjoyer(
+    _uuid: String,
+    // mut cookies: Cookies,
+    verified_uuid: VerifiedEnjoyerUuid,
+    connection: DbConn,
+) -> Result<Json<EnjoyerResponse>, Status> {
+    enjoyer::repository::get_enjoyer(verified_uuid.value, &connection)
+        .map(|enjoyer| {
+            Json(EnjoyerResponse {
+                id: enjoyer.id,
+                enjoyername: enjoyer.enjoyername,
+            })
+        })
+        .map_err(|error| error_status(error))
 }
 
 #[put("/<id>", format = "application/json", data = "<enjoyer>")]
@@ -82,7 +109,7 @@ pub fn update_enjoyer(
     enjoyer: Json<Enjoyer>,
     connection: DbConn,
 ) -> Result<Json<Enjoyer>, Status> {
-    let uuid = Uuid::from_str(&id).expect("valid UUID string");
+    let uuid = Uuid::from_str(&id).map_err(|_| Status::BadRequest)?;
     enjoyer::repository::update_enjoyer(uuid, enjoyer.into_inner(), &connection)
         .map(|enjoyer| Json(enjoyer))
         .map_err(|error| error_status(error))
