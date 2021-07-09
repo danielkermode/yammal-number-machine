@@ -5,3 +5,4 @@
 */production
 .vscode
 Rocket.toml
+.DS_Store
