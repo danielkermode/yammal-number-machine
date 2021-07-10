@@ -89,7 +89,6 @@ pub fn login(
 #[get("/<_uuid>")]
 pub fn get_enjoyer(
     _uuid: String,
-    // mut cookies: Cookies,
     verified_uuid: VerifiedEnjoyerUuid,
     connection: DbConn,
 ) -> Result<Json<EnjoyerResponse>, Status> {

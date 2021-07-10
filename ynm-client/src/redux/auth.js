@@ -4,16 +4,20 @@ import { apiUrl } from '../api'
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { enjoyer: null },
+  initialState: { enjoyer: null, loggedIn: !!window.localStorage.getItem('ynmLoggedIn') },
   reducers: {
     setEnjoyer (state, action) {
       const { enjoyer } = action.payload
       state.enjoyer = enjoyer
+    },
+    setLoggedIn (state, action) {
+      const loggedIn = action.payload
+      state.loggedIn = loggedIn
     }
   }
 })
 
-export const { setError, setEnjoyer } = authSlice.actions
+export const { setLoggedIn, setEnjoyer } = authSlice.actions
 
 export const register = (registerDetails, history) => async dispatch => {
   const enjoyerData = {
@@ -46,9 +50,16 @@ export const login = (loginDetails, history) => async dispatch => {
       },
       withCredentials: true
     })
-    const getEnjoyerThunk = getEnjoyer(response.data)
-    await getEnjoyerThunk(dispatch)
-    history.push('/')
+    if (response.data) {
+      dispatch(setLoggedIn(true))
+      window.localStorage.setItem('ynmLoggedIn', true)
+      window.localStorage.setItem('ynmUuid', response.data)
+
+      const getEnjoyerThunk = getEnjoyer(response.data)
+      await getEnjoyerThunk(dispatch)
+    } else {
+      throw new Error('No response data.')
+    }
   } catch (err) {
     console.error(err)
     window.alert(err.message)

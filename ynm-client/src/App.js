@@ -3,7 +3,7 @@ import {
   BrowserRouter as Router
 } from 'react-router-dom'
 
-import routes from './routes'
+import Routes from './routes'
 import Nav from './components/Nav'
 import Header from './components/Header'
 
@@ -12,7 +12,7 @@ export default function App () {
     <Router>
       <Header />
       <Nav />
-      {routes()}
+      <Routes />
     </Router>
   )
 }

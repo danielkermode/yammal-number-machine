@@ -6,17 +6,19 @@ import {
 
 import Home from './pages/Home'
 import About from './pages/About'
-import AuthenticatePage from './pages/Authenticate'
+import Authenticate from './pages/Authenticate'
+import Enjoyer from './pages/Enjoyer'
 import NotFound from './pages/NotFound'
+import { connect } from 'react-redux'
 
-export default function Routes () {
+function Routes (props) {
   return (
     <Switch>
       <Route exact path='/about'>
         <About />
       </Route>
       <Route exact path='/tokens'>
-        <AuthenticatePage />
+        {props.loggedIn ? <Enjoyer /> : <Authenticate />}
       </Route>
       <Route exact path='/'>
         <Home />
@@ -25,3 +27,5 @@ export default function Routes () {
     </Switch>
   )
 }
+
+export default connect(state => ({ loggedIn: state.auth.loggedIn }))(Routes)
