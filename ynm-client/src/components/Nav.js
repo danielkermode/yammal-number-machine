@@ -12,16 +12,25 @@ export default function Nav () {
       <Circle
         mx={10}
         cursor='pointer'
-        w='30%' bg='tomato' color='white' onClick={() => {
+        w='20%' bg='tomato' color='white' onClick={() => {
           history.push('/')
         }}
       >
         <Text>Home</Text>
       </Circle>
+      <Circle
+        mx={10}
+        cursor='pointer'
+        w='20%' bg='tomato' color='white' onClick={() => {
+          history.push('/music')
+        }}
+      > <Text>Music</Text>
+      </Circle>
 
       <Circle
+        mx={10}
         cursor='pointer'
-        w='30%' bg='tomato' color='white' onClick={() => {
+        w='20%' bg='tomato' color='white' onClick={() => {
           history.push('/about')
         }}
       > <Text>About</Text>
@@ -30,7 +39,7 @@ export default function Nav () {
       <Circle
         mx={10}
         cursor='pointer'
-        w='30%' bg='tomato' color='white' onClick={() => {
+        w='20%' bg='tomato' color='white' onClick={() => {
           history.push('/tokens')
         }}
       > <Text>Tokens</Text>

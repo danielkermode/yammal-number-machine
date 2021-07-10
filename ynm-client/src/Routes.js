@@ -5,6 +5,7 @@ import {
 } from 'react-router-dom'
 
 import Home from './pages/Home'
+import Music from './pages/Music'
 import About from './pages/About'
 import Authenticate from './pages/Authenticate'
 import Enjoyer from './pages/Enjoyer'
@@ -14,6 +15,9 @@ import { connect } from 'react-redux'
 function Routes (props) {
   return (
     <Switch>
+      <Route exact path='/music'>
+        <Music />
+      </Route>
       <Route exact path='/about'>
         <About />
       </Route>

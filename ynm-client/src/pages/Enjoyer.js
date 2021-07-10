@@ -7,14 +7,15 @@ import { getEnjoyer } from '../redux/auth'
 const mapDispatch = { getEnjoyer }
 
 function Enjoyer (props) {
+  const { enjoyer, getEnjoyer } = props
   useEffect(() => {
-    props.getEnjoyer(window.localStorage.getItem('ynmUuid'))
-  }, [])
+    getEnjoyer(window.localStorage.getItem('ynmUuid'))
+  }, [getEnjoyer])
   return (
     <Box>
-      Hello, enjoyer. You are now logged in.
+      Hello, enjoyer {enjoyer && enjoyer.enjoyername}. You are now logged in.
     </Box>
   )
 }
 
-export default connect(state => state, mapDispatch)(Enjoyer)
+export default connect(state => ({ enjoyer: state.auth.enjoyer }), mapDispatch)(Enjoyer)
