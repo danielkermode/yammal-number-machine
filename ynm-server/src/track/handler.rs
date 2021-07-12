@@ -19,7 +19,7 @@ pub fn get_tracks(connection: DbConn) -> Result<Json<Vec<Track>>, Status> {
 pub fn increment_track_stream(uuid: String, connection: DbConn) -> Result<Json<Track>, Status> {
     let uuid = Uuid::from_str(&uuid).map_err(|_| Status::BadRequest)?;
 
-    repository::increment_track_stream(uuid, &connection)
+    repository::increment_track_streams(uuid, &connection)
         .map(|track| Json(track))
         .map_err(|error| helpers::error_status(error))
 }

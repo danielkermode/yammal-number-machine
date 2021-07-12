@@ -9,11 +9,24 @@ const tracksSlice = createSlice({
     setTracks (state, action) {
       const { tracks } = action.payload
       state.list = tracks
+    },
+    setTrack (state, action) {
+      const { track } = action.payload
+      state.list = state.list.map(t => {
+        if (t.id === track.id) {
+          return {
+            ...t,
+            ...track
+          }
+        }
+
+        return t
+      })
     }
   }
 })
 
-export const { setTracks } = tracksSlice.actions
+export const { setTracks, setTrack } = tracksSlice.actions
 
 const TRACK_ORDER = [
   'the number machine',
@@ -49,6 +62,20 @@ export const getTracks = () => async dispatch => {
     })
 
     dispatch(setTracks({ tracks: orderedTracks }))
+  } catch (err) {
+    console.error(err)
+    window.alert(err.message)
+  }
+}
+
+export const incrementTrackStreams = trackId => async dispatch => {
+  try {
+    await axios({
+      method: 'post',
+      url: `${apiUrl}/tracks/increment/${trackId}`
+    })
+
+    dispatch(setTrack({ track: { hasListened: true } }))
   } catch (err) {
     console.error(err)
     window.alert(err.message)
