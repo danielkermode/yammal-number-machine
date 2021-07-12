@@ -6,3 +6,4 @@
 .vscode
 Rocket.toml
 .DS_Store
+**/music
