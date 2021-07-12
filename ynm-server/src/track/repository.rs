@@ -1,6 +1,3 @@
-#![allow(proc_macro_derive_resolution_fallback)]
-use std::io::stdin;
-
 use crate::schema::tracks::dsl::*;
 use diesel::prelude::*;
 use diesel::{PgConnection, QueryResult, RunQueryDsl};
