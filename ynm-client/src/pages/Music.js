@@ -6,10 +6,10 @@ import 'react-h5-audio-player/lib/styles.css'
 export default function Music () {
   return (
     <Box>
-      This is all about Yammal!!
+      Listen to the number machine:
       <AudioPlayer
         autoPlay
-        src='http://example.com/audio.mp3'
+        src='/music/won.mp3'
         onPlay={e => console.log('onPlay')}
       />
     </Box>
