@@ -11,6 +11,7 @@ function Enjoyer (props) {
   useEffect(() => {
     getEnjoyer(window.localStorage.getItem('ynmUuid'))
   }, [getEnjoyer])
+
   return (
     <Box>
       Hello, enjoyer {enjoyer && enjoyer.enjoyername}. You are now logged in.

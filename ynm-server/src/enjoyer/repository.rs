@@ -1,4 +1,3 @@
-#![allow(proc_macro_derive_resolution_fallback)]
 extern crate bcrypt;
 
 use super::model::Enjoyer;

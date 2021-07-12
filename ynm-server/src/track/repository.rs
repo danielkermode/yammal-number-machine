@@ -1,6 +1,6 @@
 use crate::schema::tracks::dsl::*;
 use diesel::prelude::*;
-use diesel::{PgConnection, QueryResult, RunQueryDsl};
+use diesel::{PgConnection, QueryResult};
 use uuid::Uuid;
 
 use crate::schema::tracks;
