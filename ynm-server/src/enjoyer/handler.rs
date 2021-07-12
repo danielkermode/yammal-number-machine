@@ -1,4 +1,3 @@
-use diesel::result::{DatabaseErrorKind, Error};
 use rocket::http::Cookie;
 use rocket::http::Cookies;
 use rocket::http::RawStr;
@@ -6,7 +5,7 @@ use rocket::http::Status;
 use rocket::request::{self, FromRequest, Request};
 use rocket::response::status;
 use rocket_contrib::json::Json;
-use std::env;
+
 use std::str::FromStr;
 use uuid::Uuid;
 
@@ -15,6 +14,8 @@ use crate::enjoyer;
 use crate::enjoyer::model::Enjoyer;
 use crate::enjoyer::model::EnjoyerInfo;
 use crate::enjoyer::model::EnjoyerResponse;
+
+use crate::shared::helpers;
 
 use bcrypt::verify;
 
@@ -59,7 +60,7 @@ pub fn create_enjoyer(
 ) -> Result<status::Created<Json<EnjoyerResponse>>, Status> {
     enjoyer::repository::create_enjoyer(new_enjoyer.into_inner(), &connection)
         .map(|enjoyer| enjoyer_created(enjoyer))
-        .map_err(|error| error_status(error))
+        .map_err(|error| helpers::error_status(error))
 }
 
 #[post("/login", format = "application/json", data = "<login_info>")]
@@ -69,7 +70,7 @@ pub fn login(
     connection: DbConn,
 ) -> Result<Json<Uuid>, Status> {
     let enjoyer = enjoyer::repository::get_enjoyer_by_name(login_info.enjoyername, &connection)
-        .map_err(|error| error_status(error))?;
+        .map_err(|error| helpers::error_status(error))?;
 
     let enjoyer_id = (&enjoyer.id).to_string();
     let mut auth_cookie = Cookie::new("ynm_auth", enjoyer_id);
@@ -99,7 +100,7 @@ pub fn get_enjoyer(
                 enjoyername: enjoyer.enjoyername,
             })
         })
-        .map_err(|error| error_status(error))
+        .map_err(|error| helpers::error_status(error))
 }
 
 #[put("/<id>", format = "application/json", data = "<enjoyer>")]
@@ -111,7 +112,7 @@ pub fn update_enjoyer(
     let uuid = Uuid::from_str(&id).map_err(|_| Status::BadRequest)?;
     enjoyer::repository::update_enjoyer(uuid, enjoyer.into_inner(), &connection)
         .map(|enjoyer| Json(enjoyer))
-        .map_err(|error| error_status(error))
+        .map_err(|error| helpers::error_status(error))
 }
 
 fn enjoyer_created(enjoyer: Enjoyer) -> status::Created<Json<EnjoyerResponse>> {
@@ -122,27 +123,11 @@ fn enjoyer_created(enjoyer: Enjoyer) -> status::Created<Json<EnjoyerResponse>> {
     status::Created(
         format!(
             "{host}:{port}/enjoyer/{id}",
-            host = host(),
-            port = port(),
+            host = helpers::host(),
+            port = helpers::port(),
             id = enjoyer.id
         )
         .to_string(),
         Some(Json(enjoyer_response)),
     )
-}
-
-fn host() -> String {
-    env::var("ROCKET_ADDRESS").expect("ROCKET_ADDRESS must be set")
-}
-
-fn port() -> String {
-    env::var("ROCKET_PORT").expect("ROCKET_PORT must be set")
-}
-
-fn error_status(error: Error) -> Status {
-    match error {
-        Error::NotFound => Status::NotFound,
-        Error::DatabaseError(DatabaseErrorKind::UniqueViolation, _err) => Status::Conflict,
-        _ => Status::InternalServerError,
-    }
 }

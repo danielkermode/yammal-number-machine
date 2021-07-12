@@ -17,6 +17,8 @@ use rocket_cors::{AllowedHeaders, AllowedOrigins};
 mod connection;
 mod enjoyer;
 mod schema;
+mod shared;
+mod track;
 
 #[get("/check")]
 fn index() -> &'static str {
@@ -45,6 +47,7 @@ fn main() -> () {
         .manage(connection::init_pool())
         .mount("/api", routes![index])
         .mount("/api/enjoyers", enjoyer::router::create_routes())
+        .mount("/api/tracks", track::router::create_routes())
         .attach(cors)
         .launch();
 
