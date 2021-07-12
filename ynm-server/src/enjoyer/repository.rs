@@ -1,8 +1,8 @@
 #![allow(proc_macro_derive_resolution_fallback)]
 extern crate bcrypt;
 
-use crate::enjoyer::model::Enjoyer;
-use crate::enjoyer::model::EnjoyerInfo;
+use super::model::Enjoyer;
+use super::model::EnjoyerInfo;
 use bcrypt::{hash, DEFAULT_COST};
 use diesel;
 use diesel::prelude::*;

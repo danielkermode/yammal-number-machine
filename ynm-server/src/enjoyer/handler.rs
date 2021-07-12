@@ -9,11 +9,11 @@ use rocket_contrib::json::Json;
 use std::str::FromStr;
 use uuid::Uuid;
 
+use super::model::Enjoyer;
+use super::model::EnjoyerInfo;
+use super::model::EnjoyerResponse;
+use super::repository;
 use crate::connection::DbConn;
-use crate::enjoyer;
-use crate::enjoyer::model::Enjoyer;
-use crate::enjoyer::model::EnjoyerInfo;
-use crate::enjoyer::model::EnjoyerResponse;
 
 use crate::shared::helpers;
 
@@ -29,8 +29,10 @@ impl<'a, 'r> FromRequest<'a, 'r> for VerifiedEnjoyerUuid {
             .get_param(0)
             .and_then(|r| r.ok())
             .unwrap_or("bad segment".into());
+
         let uuid = Uuid::from_str(segment)
             .map_err(|_| (Status::BadRequest, "Invalid uuid in segment".to_string()))?;
+
         req.cookies().get_private("ynm_auth").map_or(
             request::Outcome::Failure((Status::Forbidden, "No auth cookie".to_string())),
             |c| compare_cookie_to_uuid(c, uuid),
@@ -58,7 +60,7 @@ pub fn create_enjoyer(
     new_enjoyer: Json<EnjoyerInfo>,
     connection: DbConn,
 ) -> Result<status::Created<Json<EnjoyerResponse>>, Status> {
-    enjoyer::repository::create_enjoyer(new_enjoyer.into_inner(), &connection)
+    repository::create_enjoyer(new_enjoyer.into_inner(), &connection)
         .map(|enjoyer| enjoyer_created(enjoyer))
         .map_err(|error| helpers::error_status(error))
 }
@@ -69,7 +71,7 @@ pub fn login(
     mut cookies: Cookies,
     connection: DbConn,
 ) -> Result<Json<Uuid>, Status> {
-    let enjoyer = enjoyer::repository::get_enjoyer_by_name(login_info.enjoyername, &connection)
+    let enjoyer = repository::get_enjoyer_by_name(login_info.enjoyername, &connection)
         .map_err(|error| helpers::error_status(error))?;
 
     let enjoyer_id = (&enjoyer.id).to_string();
@@ -93,7 +95,7 @@ pub fn get_enjoyer(
     verified_uuid: VerifiedEnjoyerUuid,
     connection: DbConn,
 ) -> Result<Json<EnjoyerResponse>, Status> {
-    enjoyer::repository::get_enjoyer(verified_uuid.value, &connection)
+    repository::get_enjoyer(verified_uuid.value, &connection)
         .map(|enjoyer| {
             Json(EnjoyerResponse {
                 id: enjoyer.id,
@@ -110,7 +112,7 @@ pub fn update_enjoyer(
     connection: DbConn,
 ) -> Result<Json<Enjoyer>, Status> {
     let uuid = Uuid::from_str(&id).map_err(|_| Status::BadRequest)?;
-    enjoyer::repository::update_enjoyer(uuid, enjoyer.into_inner(), &connection)
+    repository::update_enjoyer(uuid, enjoyer.into_inner(), &connection)
         .map(|enjoyer| Json(enjoyer))
         .map_err(|error| helpers::error_status(error))
 }
