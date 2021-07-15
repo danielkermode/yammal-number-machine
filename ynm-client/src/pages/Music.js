@@ -10,9 +10,10 @@ import 'react-jinke-music-player/assets/index.css'
 const mapDispatch = { getTracks, incrementTrackStreams, setTrack }
 
 function Music (props) {
-  const { getTracks, incrementTrackStreams, tracks } = props
+  const { getTracks, incrementTrackStreams, tracks, setTrack } = props
 
   const [trackPlaying, setTrackPlaying] = useState(null)
+  const [trackProgress, setTrackProgress] = useState(null)
   const [audioPlayer, setAudioPlayer] = useState(null)
 
   useEffect(() => {
@@ -22,7 +23,7 @@ function Music (props) {
   return (
     <Box>
       Listen to the number machine:
-      <Box height='60vh' overflow='scroll'>
+      <Box overflow='scroll'>
         {tracks && tracks.map((track, i) => {
           const isTrackPlaying = trackPlaying === i
           return (
@@ -62,14 +63,27 @@ function Music (props) {
                 musicSrc: track.uri
               }
             })}
-            // onAudioProgress={obj => {
-            //   console.log(obj)
-            // }}
+            onAudioProgress={info => {
+              const listenedThreshold = trackProgress + 30
+              const passedListenedThreshold = info.currentTime > listenedThreshold
+              const currentTrack = tracks[info.playIndex]
+              if (currentTrack && !currentTrack.hasListened && passedListenedThreshold) {
+                const trackId = tracks[info.playIndex].id
+                if (trackId) {
+                  incrementTrackStreams(trackId)
+                }
+                setTrack({ track: { ...currentTrack, hasListened: true } })
+              }
+            }}
             getAudioInstance={audio => {
               setAudioPlayer(audio)
             }}
             onAudioPlay={info => {
               setTrackPlaying(info.playIndex)
+              setTrackProgress(info.currentTime)
+            }}
+            onAudioSeeked={info => {
+              setTrackProgress(info.currentTime)
             }}
             onAudioPause={() => {
               setTrackPlaying(null)

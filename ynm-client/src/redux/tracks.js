@@ -53,7 +53,7 @@ export const getTracks = () => async dispatch => {
     const tracks = resp.data
 
     const orderedTracks = tracks.map(track => {
-      return { ...track, trackNumber: TRACK_ORDER.findIndex(name => name === track.name) }
+      return { ...track, trackNumber: TRACK_ORDER.findIndex(name => name === track.name), hasListened: false }
     })
 
     orderedTracks.sort((a, b) => {
