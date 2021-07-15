@@ -1,82 +1,81 @@
-import React, { useEffect, useRef } from 'react'
-import { Box, Text } from '@chakra-ui/react'
-import AudioPlayer from 'react-h5-audio-player'
-import 'react-h5-audio-player/lib/styles.css'
+import React, { useEffect, useState } from 'react'
+import { Box, Icon } from '@chakra-ui/react'
 import { connect } from 'react-redux'
 import { getTracks, setTrack, incrementTrackStreams } from '../redux/tracks'
+import { FaPlay, FaPause } from 'react-icons/fa'
+
+import ReactJkMusicPlayer from 'react-jinke-music-player'
+import 'react-jinke-music-player/assets/index.css'
 
 const mapDispatch = { getTracks, incrementTrackStreams, setTrack }
 
-function playNextTrack (audioRefs, nextIndex, callPlay) {
-  audioRefs.current.forEach((track, i) => {
-    const { current } = track.audio
-    if (!current.paused && i !== nextIndex) {
-      current.pause()
-      current.currentTime = 0
-    }
-  })
-
-  if (callPlay) {
-    const newTrack = audioRefs.current[nextIndex]
-    if (newTrack) {
-      const { current } = newTrack.audio
-      current.currentTime = 0
-      current.play()
-    }
-  }
-}
-
 function Music (props) {
-  const { getTracks, incrementTrackStreams, tracks, setTrack } = props
-  const audioRefs = useRef([])
+  const { getTracks, incrementTrackStreams, tracks } = props
 
-  useEffect(() => {
-    audioRefs.current = audioRefs.current.slice(0, tracks.length)
-  }, [tracks])
+  const [trackPlaying, setTrackPlaying] = useState(null)
+  const [audioPlayer, setAudioPlayer] = useState(null)
 
   useEffect(() => {
     getTracks()
   }, [getTracks])
+
   return (
     <Box>
       Listen to the number machine:
-      {tracks.map((track, i) => {
-        return (
-          <Box key={i}>
-            <Text>{track.name}</Text>
-            <Text>Streams: {track.streams}</Text>
-            <AudioPlayer
-              onPlay={e => {
-                console.log('called')
-                playNextTrack(audioRefs, i)
-              }}
-              onClickPrevious={e => {
-                playNextTrack(audioRefs, i - 1, true)
-              }}
-              onClickNext={e => {
-                playNextTrack(audioRefs, i + 1, true)
-              }}
-              showSkipControls
-              showJumpControls={false}
-              ref={a => {
-                audioRefs.current[i] = a
-              }}
-              src={track.uri}
-              listenInterval={15000}
-              onListen={e => {
-                if (!track.hasListened && track.hasStarted) {
-                  incrementTrackStreams(track.id)
-                } else if (!track.hasStarted) {
-                  setTrack({ track: { ...track, hasStarted: true } })
-                }
-              }}
-              onEnded={e => {
-                playNextTrack(audioRefs, i + 1, true)
-              }}
-            />
-          </Box>
-        )
-      })}
+      <Box height='60vh' overflow='scroll'>
+        {tracks && tracks.map((track, i) => {
+          const isTrackPlaying = trackPlaying === i
+          return (
+            <Box key={i}>
+              {track.name}
+              <Icon
+                as={isTrackPlaying ? FaPause : FaPlay} onClick={() => {
+                  if (audioPlayer) {
+                    if (isTrackPlaying) {
+                      audioPlayer.pause()
+                    } else {
+                      audioPlayer.playByIndex(i)
+                      audioPlayer.play()
+                    }
+                  }
+                }}
+              />
+              {track.streams}
+            </Box>
+          )
+        })}
+      </Box>
+      {tracks.length
+        ? <ReactJkMusicPlayer
+            glassBg
+            showReload={false}
+            showMiniModeCover={false}
+            showMediaSession
+            showThemeSwitch={false}
+            remove={false}
+            mode='full'
+            theme='auto'
+            autoPlay={false}
+            audioLists={tracks.map(track => {
+              return {
+                name: track.name,
+                musicSrc: track.uri
+              }
+            })}
+            // onAudioProgress={obj => {
+            //   console.log(obj)
+            // }}
+            getAudioInstance={audio => {
+              setAudioPlayer(audio)
+            }}
+            onAudioPlay={info => {
+              setTrackPlaying(info.playIndex)
+            }}
+            onAudioPause={() => {
+              setTrackPlaying(null)
+            }}
+          />
+        : <></>}
 
     </Box>
   )
