@@ -36,14 +36,14 @@ export default function Nav () {
       > <Text>About</Text>
       </Circle>
 
-      <Circle
+      {/* <Circle
         mx={10}
         cursor='pointer'
         w='20%' bg='tomato' color='white' onClick={() => {
           history.push('/tokens')
         }}
       > <Text>Tokens</Text>
-      </Circle>
+      </Circle> */}
     </Center>
   )
 }

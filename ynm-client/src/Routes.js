@@ -7,8 +7,8 @@ import {
 import Home from './pages/Home'
 import Music from './pages/Music'
 import About from './pages/About'
-import Authenticate from './pages/Authenticate'
-import Enjoyer from './pages/Enjoyer'
+// import Authenticate from './pages/Authenticate'
+// import Enjoyer from './pages/Enjoyer'
 import NotFound from './pages/NotFound'
 import { connect } from 'react-redux'
 
@@ -21,9 +21,9 @@ function Routes (props) {
       <Route exact path='/about'>
         <About />
       </Route>
-      <Route exact path='/tokens'>
+      {/* <Route exact path='/tokens'>
         {props.loggedIn ? <Enjoyer /> : <Authenticate />}
-      </Route>
+      </Route> */}
       <Route exact path='/'>
         <Home />
       </Route>
