@@ -89,6 +89,12 @@ pub fn login(
     }
 }
 
+#[get("/logout", format = "application/json")]
+pub fn logout(mut cookies: Cookies) -> Status {
+    cookies.remove_private(Cookie::named("ynm_auth"));
+    Status::Accepted
+}
+
 #[get("/<_uuid>")]
 pub fn get_enjoyer(
     _uuid: String,

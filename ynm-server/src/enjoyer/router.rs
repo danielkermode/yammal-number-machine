@@ -7,6 +7,7 @@ pub fn create_routes() -> Vec<Route> {
         enjoyer::handler::create_enjoyer,
         enjoyer::handler::get_enjoyer,
         enjoyer::handler::update_enjoyer,
-        enjoyer::handler::login
+        enjoyer::handler::login,
+        enjoyer::handler::logout
     ]
 }

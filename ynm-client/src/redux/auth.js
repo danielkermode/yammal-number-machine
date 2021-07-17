@@ -68,14 +68,16 @@ export const login = (loginDetails, history) => async dispatch => {
 
 export const logout = () => async dispatch => {
   try {
+    window.localStorage.removeItem('ynmLoggedIn')
+    window.localStorage.removeItem('ynmUuid')
+    dispatch(setEnjoyer({ enjoyer: null }))
+    dispatch(setLoggedIn(false))
     const response = await axios({
-      method: 'post',
-      url: `${apiUrl}/logout`,
+      method: 'get',
+      url: `${apiUrl}/enjoyers/logout`,
       withCredentials: true
     })
-
     console.log(response)
-    dispatch(setEnjoyer({ enjoyer: null }))
   } catch (err) {
     console.error(err)
     window.alert(err.message)
@@ -92,7 +94,9 @@ export const getEnjoyer = id => async dispatch => {
     dispatch(setEnjoyer({ enjoyer: response.data }))
   } catch (err) {
     console.error(err)
-    window.localStorage.removeItem('ynmLoggedIn')
+
+    await logout()(dispatch)
+
     // window.alert(err.message)
   }
 }
