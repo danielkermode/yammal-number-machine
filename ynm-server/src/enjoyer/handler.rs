@@ -28,7 +28,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for VerifiedEnjoyerUuid {
         let segment: &RawStr = req
             .get_param(0)
             .and_then(|r| r.ok())
-            .unwrap_or("bad segment".into());
+            .unwrap_or_else(|| "bad segment".into());
 
         let uuid = Uuid::from_str(segment)
             .map_err(|_| (Status::BadRequest, "Invalid uuid in segment".to_string()))?;
@@ -61,8 +61,8 @@ pub fn create_enjoyer(
     connection: DbConn,
 ) -> Result<status::Created<Json<EnjoyerResponse>>, Status> {
     repository::create_enjoyer(new_enjoyer.into_inner(), &connection)
-        .map(|enjoyer| enjoyer_created(enjoyer))
-        .map_err(|error| helpers::error_status(error))
+        .map(enjoyer_created)
+        .map_err(helpers::error_status)
 }
 
 #[post("/login", format = "application/json", data = "<login_info>")]
@@ -72,7 +72,7 @@ pub fn login(
     connection: DbConn,
 ) -> Result<Json<Uuid>, Status> {
     let enjoyer = repository::get_enjoyer_by_name(login_info.enjoyername, &connection)
-        .map_err(|error| helpers::error_status(error))?;
+        .map_err(helpers::error_status)?;
 
     let enjoyer_id = (&enjoyer.id).to_string();
     let mut auth_cookie = Cookie::new("ynm_auth", enjoyer_id);
@@ -102,7 +102,7 @@ pub fn get_enjoyer(
                 enjoyername: enjoyer.enjoyername,
             })
         })
-        .map_err(|error| helpers::error_status(error))
+        .map_err(helpers::error_status)
 }
 
 #[put("/<id>", format = "application/json", data = "<enjoyer>")]
@@ -113,8 +113,8 @@ pub fn update_enjoyer(
 ) -> Result<Json<Enjoyer>, Status> {
     let uuid = Uuid::from_str(&id).map_err(|_| Status::BadRequest)?;
     repository::update_enjoyer(uuid, enjoyer.into_inner(), &connection)
-        .map(|enjoyer| Json(enjoyer))
-        .map_err(|error| helpers::error_status(error))
+        .map(Json)
+        .map_err(helpers::error_status)
 }
 
 fn enjoyer_created(enjoyer: Enjoyer) -> status::Created<Json<EnjoyerResponse>> {
@@ -128,8 +128,7 @@ fn enjoyer_created(enjoyer: Enjoyer) -> status::Created<Json<EnjoyerResponse>> {
             host = helpers::host(),
             port = helpers::port(),
             id = enjoyer.id
-        )
-        .to_string(),
+        ),
         Some(Json(enjoyer_response)),
     )
 }

@@ -92,7 +92,8 @@ export const getEnjoyer = id => async dispatch => {
     dispatch(setEnjoyer({ enjoyer: response.data }))
   } catch (err) {
     console.error(err)
-    window.alert(err.message)
+    window.localStorage.removeItem('ynmLoggedIn')
+    // window.alert(err.message)
   }
 }
 

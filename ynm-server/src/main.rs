@@ -25,7 +25,7 @@ fn index() -> &'static str {
     "Rust server running!"
 }
 
-fn main() -> () {
+fn main() {
     dotenv().ok();
 
     let allowed_origins = AllowedOrigins::All;
