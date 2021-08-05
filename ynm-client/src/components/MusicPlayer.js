@@ -26,7 +26,7 @@ function Music (props) {
             showThemeSwitch={false}
             remove={false}
             mode='full'
-            theme='auto'
+            theme='dark'
             autoPlay={false}
             audioLists={tracks.map(track => {
               return {
