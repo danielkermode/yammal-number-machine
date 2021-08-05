@@ -4,8 +4,12 @@ import { apiUrl } from '../api'
 
 const tracksSlice = createSlice({
   name: 'tracks',
-  initialState: { list: [] },
+  initialState: { list: [], trackPlaying: null },
   reducers: {
+    setTrackPlaying (state, action) {
+      const { trackPlaying } = action.payload
+      state.trackPlaying = trackPlaying
+    },
     setTracks (state, action) {
       const { tracks } = action.payload
       state.list = tracks
@@ -26,7 +30,7 @@ const tracksSlice = createSlice({
   }
 })
 
-export const { setTracks, setTrack } = tracksSlice.actions
+export const { setTracks, setTrack, setTrackPlaying } = tracksSlice.actions
 
 const TRACK_ORDER = [
   'the number machine',
@@ -79,6 +83,10 @@ export const incrementTrackStreams = trackId => async dispatch => {
     console.error(err)
     window.alert(err.message)
   }
+}
+
+export const setAudioPlayer = (setAudioPlayerFunction, audio) => async () => {
+  setAudioPlayerFunction(audio)
 }
 
 export default tracksSlice.reducer

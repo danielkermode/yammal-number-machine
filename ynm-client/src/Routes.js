@@ -16,7 +16,7 @@ function Routes (props) {
   return (
     <Switch>
       <Route exact path='/music'>
-        <Music />
+        <Music audioPlayer={props.audioPlayer} />
       </Route>
       <Route exact path='/about'>
         <About />
