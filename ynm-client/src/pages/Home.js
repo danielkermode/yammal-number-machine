@@ -1,10 +1,11 @@
 import React from 'react'
-import { Box } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
+import YammalBox from '../components/YammalBox'
 
 export default function Home () {
   return (
-    <Box>
-      Home page
-    </Box>
+    <Flex align='center' justify='center'>
+      <YammalBox />
+    </Flex>
   )
 }

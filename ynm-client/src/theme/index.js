@@ -1,11 +1,16 @@
 import { extendTheme } from '@chakra-ui/react'
+import AppleCursor from '../assets/apple_cursor.svg'
+
+console.log(AppleCursor)
 
 // Global style overrides
 const theme = extendTheme({
   styles: {
     global: {
       body: {
-        margin: 10
+        margin: 10,
+        background: 'black',
+        cursor: `url('${AppleCursor}'), auto`
       }
     }
   }

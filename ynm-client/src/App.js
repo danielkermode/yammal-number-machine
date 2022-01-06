@@ -5,7 +5,6 @@ import {
 
 import Routes from './routes'
 import Nav from './components/Nav'
-import Header from './components/Header'
 import MusicPlayer from './components/MusicPlayer'
 
 export default function App () {
@@ -13,7 +12,6 @@ export default function App () {
 
   return (
     <Router>
-      <Header />
       <MusicPlayer setAudioPlayer={setAudioPlayer} />
       <Nav />
       <Routes audioPlayer={audioPlayer} />

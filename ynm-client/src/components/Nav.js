@@ -3,38 +3,34 @@ import {
   useHistory
 } from 'react-router-dom'
 
-import { Center, Text, Circle } from '@chakra-ui/react'
+import { Flex, Text, Box } from '@chakra-ui/react'
 
 export default function Nav () {
   const history = useHistory()
   return (
-    <Center>
-      <Circle
-        mx={10}
-        cursor='pointer'
-        w='20%' bg='tomato' color='white' onClick={() => {
-          history.push('/')
-        }}
-      >
-        <Text>Home</Text>
-      </Circle>
-      <Circle
-        mx={10}
-        cursor='pointer'
-        w='20%' bg='tomato' color='white' onClick={() => {
-          history.push('/music')
-        }}
-      > <Text>Music</Text>
-      </Circle>
-
-      <Circle
-        mx={10}
-        cursor='pointer'
-        w='20%' bg='tomato' color='white' onClick={() => {
-          history.push('/about')
-        }}
-      > <Text>About</Text>
-      </Circle>
+    <Flex>
+      <Box m={5}>
+        <Text
+          style={{ fontFamily: 'manofa', fontWeight: 'bold', fontSize: 12 }}
+          cursor='pointer'
+          color='white'
+          onClick={() => {
+            history.push('/')
+          }}
+        >YAMMAL
+        </Text>
+      </Box>
+      <Box m={5}>
+        <Text
+          style={{ fontFamily: 'manofa', fontWeight: 'bold', fontSize: 12 }}
+          cursor='pointer'
+          color='white'
+          onClick={() => {
+            history.push('/music')
+          }}
+        >LISTEN
+        </Text>
+      </Box>
 
       {/* <Circle
         mx={10}
@@ -44,6 +40,6 @@ export default function Nav () {
         }}
       > <Text>Tokens</Text>
       </Circle> */}
-    </Center>
+    </Flex>
   )
 }
