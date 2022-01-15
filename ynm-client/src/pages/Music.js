@@ -14,14 +14,13 @@ function Music (props) {
   }, [getTracks])
 
   return (
-    <Box>
-      Listen to the number machine:
-      <Box overflow='scroll'>
+    <Box style={{ color: 'white' }}>
+      THE NUMBER MACHINE
+      <Box overflowY='scroll' style={{ width: '35%' }}>
         {tracks && tracks.map((track, i) => {
           const isTrackPlaying = trackPlaying === i
           return (
             <Box key={i}>
-              {track.name}
               <Icon
                 as={isTrackPlaying ? FaPause : FaPlay} onClick={() => {
                   if (audioPlayer) {
@@ -34,6 +33,8 @@ function Music (props) {
                   }
                 }}
               />
+              {track.name}
+
               {track.streams}
             </Box>
           )

@@ -3,7 +3,10 @@ import { connect } from 'react-redux'
 import { getTracks, setTrack, incrementTrackStreams, setTrackPlaying } from '../redux/tracks'
 
 import ReactJkMusicPlayer from 'react-jinke-music-player'
+import trackIcons from '../assets/track-icons/trackIcons'
+
 import 'react-jinke-music-player/assets/index.css'
+import '../assets/music-player-override.css'
 
 const mapDispatch = { getTracks, incrementTrackStreams, setTrack, setTrackPlaying }
 
@@ -28,10 +31,11 @@ function Music (props) {
             mode='full'
             theme='dark'
             autoPlay={false}
-            audioLists={tracks.map(track => {
+            audioLists={tracks.map((track, i) => {
               return {
                 name: track.name,
-                musicSrc: track.uri
+                musicSrc: track.uri,
+                cover: trackIcons[i].default
               }
             })}
             onAudioProgress={info => {

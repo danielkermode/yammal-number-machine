@@ -8,7 +8,7 @@ const theme = extendTheme({
   styles: {
     global: {
       body: {
-        margin: 10,
+        margin: 5,
         background: 'black',
         cursor: `url('${AppleCursor}'), auto`
       }
