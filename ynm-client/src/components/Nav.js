@@ -1,36 +1,49 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   useHistory
 } from 'react-router-dom'
 
-import { Flex, Text, Box } from '@chakra-ui/react'
+import { Flex, Text } from '@chakra-ui/react'
 
 export default function Nav () {
   const history = useHistory()
+  const [rerender, setRerender] = useState(false)
+  const isHome = window.location.pathname === '/'
+  const isMusic = window.location.pathname === '/music' || window.location.pathname === '/music/'
   return (
     <Flex>
-      <Box m={5}>
-        <Text
-          style={{ fontFamily: 'manofa', fontWeight: 'bold', fontSize: 12 }}
-          cursor='pointer'
-          color='white'
-          onClick={() => {
-            history.push('/')
-          }}
-        >YAMMAL
-        </Text>
-      </Box>
-      <Box m={5}>
-        <Text
-          style={{ fontFamily: 'manofa', fontWeight: 'bold', fontSize: 12 }}
-          cursor='pointer'
-          color='white'
-          onClick={() => {
-            history.push('/music')
-          }}
-        >LISTEN
-        </Text>
-      </Box>
+      <Text
+        as={isHome && 'u'}
+        m={5}
+        textUnderlineOffset={5}
+        style={{ fontFamily: 'manofa', fontWeight: 'bold', fontSize: 12 }}
+        cursor='pointer'
+        color={isHome ? 'white' : '#d3d3d3'}
+        _hover={{
+          color: 'white'
+        }}
+        onClick={() => {
+          setRerender(!rerender)
+          history.push('/')
+        }}
+      >YAMMAL
+      </Text>
+      <Text
+        as={isMusic && 'u'}
+        m={5}
+        textUnderlineOffset={5}
+        style={{ fontFamily: 'manofa', fontWeight: 'bold', fontSize: 12 }}
+        cursor='pointer'
+        color={isMusic ? 'white' : '#d3d3d3'}
+        _hover={{
+          color: 'white'
+        }}
+        onClick={() => {
+          setRerender(!rerender)
+          history.push('/music')
+        }}
+      >LISTEN
+      </Text>
 
       {/* <Circle
         mx={10}
