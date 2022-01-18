@@ -1,8 +1,6 @@
 import { extendTheme } from '@chakra-ui/react'
 import AppleCursor from '../assets/apple_cursor.svg'
-
-console.log(AppleCursor)
-
+import '../assets/styles.css'
 // Global style overrides
 const theme = extendTheme({
   styles: {

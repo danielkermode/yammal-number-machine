@@ -39,7 +39,7 @@ function YammalInfo () {
             letterSpacing: 0.8
           }}
         >
-          MAKER OF MUSIC | ARTIFICIAL HUMAN
+          MAKER OF MUSIC | ARTIFICIAL INTELLIGENCE
         </Text>
         <Text
           mt={2}

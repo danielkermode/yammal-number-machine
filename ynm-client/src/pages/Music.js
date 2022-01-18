@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
-import { Box, Icon } from '@chakra-ui/react'
+import MusicIcons from '../components/MusicIcons'
+import { Box, Icon, Flex } from '@chakra-ui/react'
 import { connect } from 'react-redux'
 import { getTracks } from '../redux/tracks'
 import { FaPlay, FaPause } from 'react-icons/fa'
@@ -16,31 +17,42 @@ function Music (props) {
   return (
     <Box style={{ color: 'white' }}>
       THE NUMBER MACHINE
-      <Box overflowY='scroll' style={{ width: '35%' }}>
-        {tracks && tracks.map((track, i) => {
-          const isTrackPlaying = trackPlaying === i
-          return (
-            <Box key={i}>
-              <Icon
-                as={isTrackPlaying ? FaPause : FaPlay} onClick={() => {
-                  if (audioPlayer) {
-                    if (isTrackPlaying) {
-                      audioPlayer.pause()
-                    } else {
-                      audioPlayer.playByIndex(i)
-                      audioPlayer.play()
-                    }
-                  }
-                }}
-              />
-              {track.name}
+      <Flex>
+        <Box style={{ width: '35%' }}>
+          {tracks && tracks.map((track, i) => {
+            const isTrackPlaying = trackPlaying === i
+            return (
+              <Box key={i}>
+                <hr style={{ opacity: 0.3 }} />
+                <Box m={1} mx={2} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Box>
+                    <Icon
+                      as={isTrackPlaying ? FaPause : FaPlay}
+                      onClick={() => {
+                        if (audioPlayer) {
+                          if (isTrackPlaying) {
+                            audioPlayer.pause()
+                          } else {
+                            audioPlayer.playByIndex(i)
+                            audioPlayer.play()
+                          }
+                        }
+                      }}
+                    />
 
-              {track.streams}
-            </Box>
-          )
-        })}
-      </Box>
-
+                    <span style={{ marginLeft: 10 }}>{track.name}</span>
+                  </Box>
+                  <Box>
+                    {track.streams}
+                  </Box>
+                </Box>
+              </Box>
+            )
+          })}
+          <hr style={{ opacity: 0.3 }} />
+        </Box>
+        <MusicIcons audioPlayer={audioPlayer} trackPlaying={trackPlaying} />
+      </Flex>
     </Box>
   )
 }
