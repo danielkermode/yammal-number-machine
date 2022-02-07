@@ -20,7 +20,6 @@ function MusicIconImage (props) {
   const { audioPlayer, src, alt, style, trackPlaying, number } = props
 
   const isTrackPlaying = trackPlaying === number
-  console.log(trackPlaying)
   return (
     <Box
       style={{ position: 'relative' }}
@@ -43,20 +42,37 @@ function MusicIconImage (props) {
         }}
       />
       {hover &&
-        <Icon
-          style={{ position: 'absolute', bottom: '50%', right: '50%', cursor: 'pointer' }}
-          as={isTrackPlaying ? FaPause : FaPlay}
-          onClick={() => {
-            if (audioPlayer) {
-              if (isTrackPlaying) {
-                audioPlayer.pause()
-              } else {
-                audioPlayer.playByIndex(number)
-                audioPlayer.play()
-              }
-            }
+        <Box
+          alignContent='center'
+          justifyContent='center'
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'absolute',
+            bottom: '50%',
+            right: '50%',
+            cursor: 'pointer',
+            borderRadius: '50%',
+            height: 30,
+            width: 30,
+            border: '1px solid white'
           }}
-        />}
+        >
+          <Icon
+            as={isTrackPlaying ? FaPause : FaPlay}
+            onClick={() => {
+              if (audioPlayer) {
+                if (isTrackPlaying) {
+                  audioPlayer.pause()
+                } else {
+                  audioPlayer.playByIndex(number)
+                  audioPlayer.play()
+                }
+              }
+            }}
+          />
+        </Box>}
     </Box>
   )
 }

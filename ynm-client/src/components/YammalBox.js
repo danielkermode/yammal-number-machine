@@ -39,7 +39,16 @@ function YammalInfo () {
             letterSpacing: 0.8
           }}
         >
-          MAKER OF MUSIC | ARTIFICIAL INTELLIGENCE
+          MAKER OF MUSIC
+        </Text>
+        <Text
+          style={{
+            fontFamily: 'eb garamond',
+            fontSize: 10,
+            letterSpacing: 0.8
+          }}
+        >
+          ARTIFICIAL INTELLIGENCE
         </Text>
         <Text
           mt={2}
